@@ -129,7 +129,7 @@ void GameReplay(){
     int moveNum = 1;
 
     while(!game_over){
-        //creates move character to store data then extracts data from it
+        //creates move char to store data then extracts data from it
         char move[3];
         strcpy(move, current -> data);
         int col = move[1] - '0'; //extract the colum from the move
@@ -229,7 +229,6 @@ int main(){
                 printf("Bye Bye!\n");
                 break;
             case 'p':
-                FreeMemory();
                 movesList = createList();
                 PlayConnectFour();
                 printf("Press 'q' to quit, 'p' to play, or 'r' to replay:\n");
