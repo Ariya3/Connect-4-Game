@@ -107,40 +107,59 @@ void PrintBoard(char board[][NUM_COLS]){
 void RecordMove(int col, char player){
     //create a string of the move like R2
     char move[3];
-    sprintf(move, "%c%d", player, col + 1);
+    sprintf(move, "%c%d", player, col);
 
     //put move into linked list
     insertTail(movesList, move);
 }
 
-
 //replays the game by showing the moves from the linked list
-void ReplayGame(){
-    struct node* current = movesList -> head;
+void GameReplay(){
+    //creates new board
+    char board[NUM_ROWS][NUM_COLS];
+    for (int r = 0; r < NUM_ROWS; r++){
+        for (int c = 0; c < NUM_COLS; c++){
+            board[r][c] = ' ';
+        }
+    }
 
-    while(current != NULL){
+    //points to head node
+    struct node* current = movesList -> head;
+    Bool game_over = F; 
+    int moveNum = 1;
+
+    while(!game_over){
+        //creates move character to store data then extracts data from it
         char move[3];
         strcpy(move, current -> data);
-        int col = move[1] - '0' -1; //extract the colum from the move
+        int col = move[1] - '0'; //extract the colum from the move
+        int row = GetEmptyRow(board, col);
         char player = move[0]; //extract the player from the move
 
-        int row = GetEmptyRow(board, col);
+        //counts number of moves made by player
+        printf("%s move number %d\n", move[0]=='R' ? "Red":"Yellow", moveNum);
+        moveNum++;
+
+        //puts extracted data into new board and prints
         board[row][col] = player;
+        RecordMove(col, player);
         PrintBoard(board);
 
+        //checks for winner
         char winner = CheckWinner(board);
-        if(winner != ' '){
-            printf("You win, %s!\n", winner == 'R' ? "Red" : "Yellow");
-            break; //end replay if winner found
+        if (winner != ' '){
+            printf("You win, %s!\n", winner=='R' ? "Red":"Yellow");
+            game_over = T; //
+            //break;
         } else if (CheckBoardFull(board)){
             printf("It's a tie!\n");
-            break; //end replay if tie
+            game_over = T;  //
+            //break;
         }
 
-        //delay so doesn't go so fast durring output
-        Sleep(1);
-
-        current = current -> next;
+        //creates a delay inbetween each board being printed
+        Sleep(5);
+        
     }
 }
 
@@ -201,7 +220,7 @@ int main(){
     
     //starts the loop for the game
     while(!done){
-        printf("Press 'q' to quit, 'p' to play, or 'r' to replay:\n");
+        //printf("Press 'q' to quit, 'p' to play, or 'r' to replay:\n");
         scanf(" %c", &c);
         
         switch(c){
@@ -210,16 +229,19 @@ int main(){
                 printf("Bye Bye!\n");
                 break;
             case 'p':
+                FreeMemory();
                 movesList = createList();
                 PlayConnectFour();
-                FreeMemory();
+                printf("Press 'q' to quit, 'p' to play, or 'r' to replay:\n");
                 break;
             case 'r':
                 if(movesList != NULL){
-                    ReplayGame();
+                    GameReplay();
                 } else {
                     printf("No moves to replay\n");
                 }
+                FreeMemory();
+                printf("Press 'q' to quit, 'p' to play, or 'r' to replay:\n");
                 break;
             default:
                 printf("Invalid input, please enter 'p', 'r', or 'q'\n");
